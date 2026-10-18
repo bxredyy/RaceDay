@@ -1,0 +1,169 @@
+# RaceDay
+
+Mukona Mamaila  
+ST10494639  
+PROG6212 Part 2
+
+RaceDay is an API for running, walking and cycling events. Organisers can manage their events, categories and results. Participants can register, enter events and view their own results.
+
+The project uses C#, ASP.NET Core, SQL Server and Entity Framework Core. The folders separate the endpoints, business rules and database work. [14] Swagger is used to try requests and check the responses. [16]
+
+## Video and build
+
+- YouTube video: still to be added.
+- GitHub Actions screenshot: still to be added after the workflow passes.
+
+## What you need
+
+- .NET 10 SDK [9]
+- Visual Studio 2026 with ASP.NET and web development installed [9]
+- SQL Server or SQL Server LocalDB
+
+## Run the project
+
+Open CMD in the folder with `RaceDay.sln`.
+
+For the LocalDB instance used during testing:
+
+```cmd
+SqlLocalDB start RaceDayLocalDB
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-RaceDay.ps1 -ConnectionString "Server=(localdb)\RaceDayLocalDB;Database=RaceDay;Trusted_Connection=True;TrustServerCertificate=True"
+```
+
+The script restores packages, builds the project, runs the tests and sets up the database. It then starts the API.
+
+Open http://localhost:5080/swagger and leave the terminal running.
+
+If your instance is called `MSSQLLocalDB`, use that name in the connection string. For SQL Server Express, use `Server=.\SQLEXPRESS` instead. Check the instance name on your machine before running the command.
+
+You can also open `RaceDay.sln` in Visual Studio and set `RaceDay.Api` as the startup project. Set up the database first, then press F5.
+
+## Database
+
+There are six main tables: Users, Events, Categories, Enrolments, Results and AuditLogs.
+
+The migration is in `Part2/RaceDay.Api/Data/Migrations`. The startup script applies it and adds demo data when the Users table is empty.
+
+Another option is to run `docs/RaceDay.sql` in SSMS. It creates the same schema and adds demo data. You only need one setup method.
+
+The original Part 1 SQL script was not available when this version was built. The included script was made from the EF migration. Changes from the Part 1 plan are explained in [plan changes](docs/plan-amendments.md).
+
+## Demo accounts
+
+The password for these accounts is `RaceDay!Demo2026`.
+
+| Email | Role |
+|---|---|
+| organiser1@raceday.example | Organiser |
+| organiser2@raceday.example | Organiser |
+| participant1@raceday.example | Participant |
+| participant2@raceday.example | Participant |
+
+These are demo accounts. You can also register a new account with either role. The two roles have different permissions, following role-based access control. [11]
+
+## Try it in Swagger
+
+1. Open `POST /api/auth/login`, click **Try it out** and log in with a demo account.
+2. Run `GET /api/users/profile` to check the logged-in account.
+3. As an Organiser, create an event and add a category. Keep the returned IDs.
+4. Log out and log in as a Participant.
+5. Enter the event using `POST /api/enrolments` and check `GET /api/enrolments/my-enrolments`.
+6. Try creating an event as a Participant. This should return 403.
+7. Log out and try viewing the profile. This should return 401.
+
+Swagger sends the session cookie automatically. You do not need to paste a bearer token. Session handling follows the ASP.NET Core setup. [1]
+
+HTTP codes show the result of a request. For example, 201 means a record was created, 401 means login is required or invalid, 403 means access is refused and 409 means a conflict with existing data. [12]
+
+Example event:
+
+```json
+{
+  "name": "Pretoria Community Run",
+  "description": "A community road running event.",
+  "eventDate": "2030-11-15T06:00:00Z",
+  "location": "Pretoria",
+  "distanceKm": 10,
+  "eventType": "Run",
+  "bannerImageUrl": null
+}
+```
+
+Use a future date for a new event. Dates use UTC, distances are in kilometres and fees are in rand. Passwords must be 12 to 128 characters long.
+
+The demo data also has a completed walk. Organiser 1 can use its enrolment list to find Participant 2's entry and add a result. Use the actual enrolment ID from the response. An example finish time is `00:48:00`, with overall position 2 and category position 2.
+
+The full endpoint list is in [endpoint plan](docs/endpoint-plan.md).
+
+## Tests
+
+From CMD in the project folder:
+
+```cmd
+dotnet restore RaceDay.sln
+dotnet build RaceDay.sln --configuration Release --no-restore
+dotnet test RaceDay.sln --configuration Release --no-build
+```
+
+The tests prepare data, perform an action and check the result, following arrange, act and assert. [13] Most tests are integration tests because they call the API and use a database. Their test host follows Microsoft's integration-testing guide. [3]
+
+The default tests use SQLite. To run them against SQL Server:
+
+```cmd
+set "RACEDAY_TEST_SQLSERVER=Server=(localdb)\RaceDayLocalDB;Database=master;Trusted_Connection=True;TrustServerCertificate=True"
+dotnet test RaceDay.sln --configuration Release --no-build --logger trx --results-directory TestResults\SqlServer
+set "RACEDAY_TEST_SQLSERVER="
+```
+
+SQL Server tests create separate databases with names starting with `RaceDayTests_` and delete them afterwards. They do not use the RaceDay application database.
+
+The Windows SQL Server run passed all 74 tests on 17 October 2026 after fixing the test cleanup. There are also four decimal validation tests in the updated download. See [test notes](docs/verification.md) for the separate runs and remaining checks.
+
+GitHub Actions builds the solution and runs the tests with SQLite and SQL Server. The SQL Server job also runs the SQL script twice to check that demo data is not duplicated.
+
+## Folders
+
+| Folder | What it contains |
+|---|---|
+| Controllers | API endpoints and role checks |
+| Contracts | Request and response classes |
+| Models | Database models |
+| Services | Validation and business rules |
+| Security | Session login and current user details |
+| Data | EF context, migrations and demo data |
+| Middleware | API error handling |
+| RaceDay.Tests | Automated tests |
+| docs | ERD, endpoint plan, SQL and project notes |
+| .github/workflows | GitHub Actions workflow |
+
+The code keeps the basic namespace and comment style from the earlier C# project. [8]
+
+## Main decisions
+
+- Login stores the user ID and role in a server-side session. The database is checked again when the user makes an authenticated request. Sessions expire after 30 minutes without activity. [1]
+- The brief gives Organisers and Participants different permissions. [6] Role-based access control checks the assigned role before allowing an action. [11], [18] RaceDay also checks ownership for organiser actions and personal histories.
+- Passwords are saved as salted hashes using `PasswordHasher`, not as plain text. [5]
+- The database blocks duplicate entries and duplicate results. A category must belong to the event being entered. [2], [10]
+- Events and categories with enrolments cannot be deleted because their history is still needed.
+- Finish times use SQL Server `time`, as in the Part 1 plan. [7] The API accepts times from `00:00:01` to `23:59:59`.
+- Sessions are held in memory in this version, so restarting the API clears them. Multiple servers would need shared session storage.
+- MVC, Azure Blob Storage and Docker are planned for Part 3. [6]
+
+## Common problems
+
+| Problem | What to check |
+|---|---|
+| `dotnet` is not recognised | Install the .NET 10 SDK and reopen CMD |
+| Cannot connect to SQL Server | Check the instance name and that it is running |
+| 401 response | Log in again in the same browser |
+| 403 response | Check the account role and who owns the event |
+| 409 response | Check for a duplicate entry, duplicate category or an event with enrolments |
+| Swagger does not open | Check that the API is running and listening on port 5080 |
+
+## AI use
+
+AI tools helped with planning, code, tests, debugging and documentation. The code and test results need to be reviewed and explained as part of the submission.
+
+## References
+
+The numbered sources are listed in [references](docs/references.md). GeeksforGeeks is used for the main concepts, with Microsoft and Swashbuckle documentation for the framework details.

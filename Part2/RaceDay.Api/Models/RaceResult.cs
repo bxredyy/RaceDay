@@ -1,4 +1,5 @@
 // The finish time and positions for an enrolment.
+// References: Result fields: [7]. One result per entry: [10]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {

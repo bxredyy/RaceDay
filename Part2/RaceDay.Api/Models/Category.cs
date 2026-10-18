@@ -1,4 +1,5 @@
 // A category and entry fee for an event.
+// References: Category fields: [7]. Table relationships: [10]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {

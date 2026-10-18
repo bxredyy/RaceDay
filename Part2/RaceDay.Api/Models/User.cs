@@ -1,4 +1,5 @@
 // User account details.
+// References: Account fields: [7]. Roles: [11]. Password hashing: [5]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {

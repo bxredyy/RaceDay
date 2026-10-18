@@ -1,4 +1,5 @@
 // Event details and the organiser who created it.
+// References: Event fields: [7]. Table relationships: [10]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {

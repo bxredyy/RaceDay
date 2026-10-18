@@ -1,4 +1,5 @@
 // A saved record of an action and its user.
+// References: Audit model: [7]. Audit logging: [11]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {

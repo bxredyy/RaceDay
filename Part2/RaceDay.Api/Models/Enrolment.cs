@@ -1,4 +1,5 @@
 // A participant entry linked to an event and category.
+// References: Entry fields: [7]. Table relationships: [10]. See docs/references.md.
 
 namespace RaceDay.Api.Models
 {
