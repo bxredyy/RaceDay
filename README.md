@@ -29,10 +29,17 @@ For the LocalDB instance used during testing:
 
 ```cmd
 SqlLocalDB start RaceDayLocalDB
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-RaceDay.ps1 -ConnectionString "Server=(localdb)\RaceDayLocalDB;Database=RaceDay;Trusted_Connection=True;TrustServerCertificate=True"
+dotnet restore RaceDay.sln
+dotnet build RaceDay.sln --configuration Release --no-restore
+dotnet test RaceDay.sln --configuration Release --no-build
+set ConnectionStrings__RaceDay=Server=(localdb)\RaceDayLocalDB;Database=RaceDay;Trusted_Connection=True;TrustServerCertificate=True
+set ASPNETCORE_ENVIRONMENT=Development
+set ASPNETCORE_URLS=http://localhost:5080
+dotnet run --project Part2/RaceDay.Api --configuration Release --no-build --no-launch-profile -- --initialise-database
+dotnet run --project Part2/RaceDay.Api --configuration Release --no-build --no-launch-profile
 ```
 
-The script restores packages, builds the project, runs the tests and sets up the database. It then starts the API.
+These commands restore packages, build and test the project, set up SQL Server and start the API.
 
 Open http://localhost:5080/swagger and leave the terminal running.
 
@@ -44,7 +51,7 @@ You can also open `RaceDay.sln` in Visual Studio and set `RaceDay.Api` as the st
 
 There are six main tables: Users, Events, Categories, Enrolments, Results and AuditLogs.
 
-The migration is in `Part2/RaceDay.Api/Data/Migrations`. The startup script applies it and adds demo data when the Users table is empty.
+The migration is in `Part2/RaceDay.Api/Data/Migrations`. Run the API with --initialise-database to apply the migration and add demo data when the Users table is empty.
 
 Another option is to run `docs/RaceDay.sql` in SSMS. It creates the same schema and adds demo data. You only need one setup method.
 
