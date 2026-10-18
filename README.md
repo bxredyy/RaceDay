@@ -11,7 +11,9 @@ The project uses C#, ASP.NET Core, SQL Server and Entity Framework Core. The fol
 ## Video and build
 
 - YouTube video: still to be added.
-- GitHub Actions screenshot: still to be added after the workflow passes.
+- GitHub Actions: [passed](https://github.com/bxredyy/RaceDay/actions/runs/39121491026)
+
+![Passing SQLite and SQL Server jobs](docs/evidence/ci-green.png)
 
 ## What you need
 
