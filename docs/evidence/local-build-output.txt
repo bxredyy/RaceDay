@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  Restored /workspace/scratch/0719fb352b02/RaceDay/Part2/RaceDay.Api/RaceDay.Api.csproj (in 6.27 sec).
+  Restored /workspace/scratch/0719fb352b02/RaceDay/Part2/RaceDay.Tests/RaceDay.Tests.csproj (in 6.27 sec).
+  RaceDay.Api -> /workspace/scratch/0719fb352b02/RaceDay/Part2/RaceDay.Api/bin/Release/net10.0/RaceDay.Api.dll
+  RaceDay.Tests -> /workspace/scratch/0719fb352b02/RaceDay/Part2/RaceDay.Tests/bin/Release/net10.0/RaceDay.Tests.dll

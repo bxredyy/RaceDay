@@ -1,0 +1,9 @@
+VSTest version 18.7.0 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Results File: /workspace/scratch/0719fb352b02/.raceday-build/test-results10/_684f4615be3a_2026-10-17_16_36_28_net10.0.trx
+
+Attachments:
+  /workspace/scratch/0719fb352b02/.raceday-build/test-results10/7c8975ab-86e8-42dd-a77a-782d9d2d452e/coverage.cobertura.xml
+Passed!  - Failed:     0, Passed:    74, Skipped:     0, Total:    74, Duration: 5 s - RaceDay.Tests.dll (net10.0)
