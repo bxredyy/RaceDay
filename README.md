@@ -23,40 +23,32 @@ The project uses C#, ASP.NET Core, SQL Server and Entity Framework Core. The fol
 
 ## Run the project
 
-Open CMD in the folder with `RaceDay.sln`.
+1. Open `RaceDay.sln` in Visual Studio 2026.
+2. Allow Visual Studio to restore the NuGet packages.
+3. Open `appsettings.json` under `RaceDay.Api`.
+4. Set the connection string to your SQL Server instance.
+5. Set up the database using the steps below.
+6. Right-click `RaceDay.Api` and select **Set as Startup Project**.
+7. Select **Build > Build Solution**.
+8. Press the green play button. Swagger opens at http://localhost:5080/swagger.
 
-For the LocalDB instance used during testing:
+The LocalDB connection string used during testing was:
+"RaceDay": "Server=(localdb)\\RaceDayLocalDB;Database=RaceDay;Trusted_Connection=True;TrustServerCertificate=True"
 
-```cmd
-SqlLocalDB start RaceDayLocalDB
-dotnet restore RaceDay.sln
-dotnet build RaceDay.sln --configuration Release --no-restore
-dotnet test RaceDay.sln --configuration Release --no-build
-set ConnectionStrings__RaceDay=Server=(localdb)\RaceDayLocalDB;Database=RaceDay;Trusted_Connection=True;TrustServerCertificate=True
-set ASPNETCORE_ENVIRONMENT=Development
-set ASPNETCORE_URLS=http://localhost:5080
-dotnet run --project Part2/RaceDay.Api --configuration Release --no-build --no-launch-profile -- --initialise-database
-dotnet run --project Part2/RaceDay.Api --configuration Release --no-build --no-launch-profile
-```
-
-These commands restore packages, build and test the project, set up SQL Server and start the API.
-
-Open http://localhost:5080/swagger and leave the terminal running.
-
-If your instance is called `MSSQLLocalDB`, use that name in the connection string. For SQL Server Express, use `Server=.\SQLEXPRESS` instead. Check the instance name on your machine before running the command.
-
-You can also open `RaceDay.sln` in Visual Studio and set `RaceDay.Api` as the startup project. Set up the database first, then press F5.
 
 ## Database
+Database
+The database has six main tables: Users, Events, Categories, Enrolments, Results and AuditLogs.
 
-There are six main tables: Users, Events, Categories, Enrolments, Results and AuditLogs.
+For the first setup:
+1. Open View > SQL Server Object Explorer in Visual Studio.
+2. Connect to the SQL Server instance used in appsettings.json.
+3. Right-click the server and select New Query.
+4. Copy the contents of docs/RaceDay.sql into the query editor.
+5. Execute the script. It creates the RaceDay database, tables and demo data.
+If the database is already set up, you can start the API without repeating these steps.
 
-The migration is in `Part2/RaceDay.Api/Data/Migrations`. Run the API with --initialise-database to apply the migration and add demo data when the Users table is empty.
-
-Another option is to run `docs/RaceDay.sql` in SSMS. It creates the same schema and adds demo data. You only need one setup method.
-
-The original Part 1 SQL script was not available when this version was built. The included script was made from the EF migration. Changes from the Part 1 plan are explained in [plan changes](docs/plan-amendments.md).
-
+The EF migration is in Part2/RaceDay.Api/Data/Migrations
 ## Demo accounts
 
 The password for these accounts is `RaceDay!Demo2026`.
@@ -171,7 +163,7 @@ The code keeps the basic namespace and comment style from the earlier C# project
 
 ## AI use
 
-AI tools helped with planning, code, tests, debugging and documentation. The code and test results need to be reviewed and explained as part of the submission.
+AI tools helped with planning, code, tests, debugging and documentation.
 
 ## References
 
