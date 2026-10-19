@@ -98,29 +98,22 @@ The full endpoint list is in [endpoint plan](docs/endpoint-plan.md).
 
 ## Tests
 
-From CMD in the project folder:
+To run the tests in Visual Studio:
 
-```cmd
-dotnet restore RaceDay.sln
-dotnet build RaceDay.sln --configuration Release --no-restore
-dotnet test RaceDay.sln --configuration Release --no-build
-```
+1. Stop the API if it is running.
+2. Open **Test > Test Explorer**.
+3. Click **Run All Tests**.
+4. Check the results for any failures.
 
-The tests prepare data, perform an action and check the result, following arrange, act and assert. [13] Most tests are integration tests because they call the API and use a database. Their test host follows Microsoft's integration-testing guide. [3]
+The tests follow arrange, act and assert: prepare the data, perform an action and check the result. [13] Most are integration tests that send requests to the API and check its behaviour with a database. [3]
 
-The default tests use SQLite. To run them against SQL Server:
+Test Explorer uses SQLite by default. Changing the API connection string does not change the test database.
 
-```cmd
-set "RACEDAY_TEST_SQLSERVER=Server=(localdb)\RaceDayLocalDB;Database=master;Trusted_Connection=True;TrustServerCertificate=True"
-dotnet test RaceDay.sln --configuration Release --no-build --logger trx --results-directory TestResults\SqlServer
-set "RACEDAY_TEST_SQLSERVER="
-```
+The saved Windows SQL Server test report records 74 passed tests. SQL Server tests create separate databases with names starting with `RaceDayTests_` and remove them afterwards.
 
-SQL Server tests create separate databases with names starting with `RaceDayTests_` and delete them afterwards. They do not use the RaceDay application database.
+GitHub Actions builds the solution and runs the tests with SQLite and SQL Server. The SQL Server job also runs the database script twice to check that demo data is not duplicated.
 
-The Windows SQL Server run passed all 74 tests on 17 October 2026 after fixing the test cleanup. There are also four decimal validation tests in the updated download. See [test notes](docs/verification.md) for the separate runs and remaining checks.
-
-GitHub Actions builds the solution and runs the tests with SQLite and SQL Server. The SQL Server job also runs the SQL script twice to check that demo data is not duplicated.
+The saved SQL Server test report is in `docs/evidence/windows-sqlserver-tests.trx`. The successful GitHub Actions screenshot is in `docs/evidence/ci-green.png`.
 
 ## Folders
 
@@ -154,7 +147,7 @@ The code keeps the basic namespace and comment style from the earlier C# project
 
 | Problem | What to check |
 |---|---|
-| `dotnet` is not recognised | Install the .NET 10 SDK and reopen CMD |
+| .NET 10 is missing in Visual Studio | Open Visual Studio Installer, select Modify and install the .NET 10 SDK and ASP.NET workload |
 | Cannot connect to SQL Server | Check the instance name and that it is running |
 | 401 response | Log in again in the same browser |
 | 403 response | Check the account role and who owns the event |
