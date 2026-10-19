@@ -10,7 +10,7 @@ The project uses C#, ASP.NET Core, SQL Server and Entity Framework Core. The fol
 
 ## Video and build
 
-- YouTube video: still to be added.
+- YouTube video: https://youtu.be/AevTd0TqWYo
 - GitHub Actions: [passed](https://github.com/bxredyy/RaceDay/actions/runs/39121491026)
 
 ![Passing SQLite and SQL Server jobs](docs/evidence/ci-green.png)
