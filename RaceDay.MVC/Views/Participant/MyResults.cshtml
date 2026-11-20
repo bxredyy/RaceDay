@@ -1,0 +1,8 @@
+@model List<ResultDto>
+<h2 class="fw-bold mb-3">My Results</h2>
+<div class="card p-4"><table class="table"><thead><tr><th>Event</th><th>Date</th><th>Category</th><th>Finish Time</th><th>Position</th></tr></thead><tbody>
+@foreach (var r in Model)
+{
+    <tr><td>@r.EventName</td><td>@r.EventDate.ToString("dd MMM yyyy")</td><td>@r.CategoryName</td><td>@r.FinishTime.ToString(@"hh\:mm\:ss")</td><td>#@r.OverallPosition out of @r.TotalFinishers (Cat #@r.CategoryPosition)</td></tr>
+}
+</tbody></table></div>

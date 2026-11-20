@@ -1,0 +1,9 @@
+@model List<EnrolmentDto>
+<h2 class="fw-bold mb-3">My Enrolments</h2>
+<div class="card p-4"><table class="table"><thead><tr><th>Event</th><th>Category</th><th>Date</th><th>Status</th></tr></thead><tbody>
+@foreach (var i in Model)
+{
+    var b = i.Status == "Confirmed" ? "bg-success" : (i.Status == "Pending" ? "bg-warning text-dark" : "bg-secondary");
+    <tr><td>@i.EventName</td><td>@i.CategoryName</td><td>@i.EnrolmentDate.ToString("dd MMM yyyy")</td><td><span class="badge @b">@i.Status</span></td></tr>
+}
+</tbody></table></div>

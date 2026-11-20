@@ -1,0 +1,21 @@
+@model OrganiserDashboardViewModel
+<h2 class="fw-bold mb-3">Organiser Dashboard</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card p-3"><div class="text-muted small">Events</div><div class="fs-2 fw-bold">@Model.TotalEvents</div></div></div>
+    <div class="col-md-4"><div class="card p-3"><div class="text-muted small">Enrolments</div><div class="fs-2 fw-bold">@Model.TotalEnrolments</div></div></div>
+    <div class="col-md-4"><div class="card p-3"><div class="text-muted small">Next Date</div><div class="fs-5 fw-bold">(@(Model.Events.OrderBy(e => e.EventDate).FirstOrDefault()?.EventDate.ToString("dd MMM yyyy") ?? "None"))</div></div></div>
+</div>
+<div class="card p-4"><table class="table"><thead><tr><th>Event</th><th>Date</th><th>Enrolments</th><th>Actions</th></tr></thead><tbody>
+@foreach (var ev in Model.Events)
+{
+    <tr>
+        <td>@ev.Name</td><td>@ev.EventDate.ToString("dd MMM yyyy")</td>
+        <td><span class="badge bg-info text-dark">@Model.EnrolmentCountsByEvent.GetValueOrDefault(ev.EventId)</span></td>
+        <td>
+            <a asp-action="Categories" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-secondary">Categories</a>
+            <a asp-action="Enrolments" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-primary">Enrolments</a>
+            <a asp-action="Results" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-success">Results</a>
+        </td>
+    </tr>
+}
+</tbody></table></div>

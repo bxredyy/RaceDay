@@ -1,0 +1,19 @@
+@model EventDto
+<div class="card p-4">
+    @if (!string.IsNullOrEmpty(Model.BannerImageUrl)) { <img src="@Model.BannerImageUrl" class="img-fluid rounded mb-3" style="max-height:340px;object-fit:cover;width:100%;" /> }
+    <span class="badge bg-primary mb-2" style="width:fit-content;">@Model.EventType</span>
+    <h2 class="fw-bold">@Model.Name</h2>
+    <p class="text-muted">@Model.Location | @Model.EventDate.ToString("dd MMM yyyy HH:mm")</p>
+    <p>@Model.Description</p>
+    <hr />
+    <form asp-action="Enrol" method="post" class="row g-3 align-items-end">
+        <input type="hidden" name="eventId" value="@Model.EventId" />
+        <div class="col-md-6">
+            <label class="form-label">Select Category</label>
+            <select name="categoryId" class="form-select">
+                @foreach (var c in Model.Categories) { <option value="@c.CategoryId">@c.CategoryName (@c.DistanceKm km) - R @c.Fee.ToString("0.00")</option> }
+            </select>
+        </div>
+        <div class="col-md-3"><button class="btn btn-success w-100">Enrol Now</button></div>
+    </form>
+</div>
