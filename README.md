@@ -1,4 +1,4 @@
-# RaceDay
+﻿# RaceDay
 
 Mukona Mamaila  
 ST10494639  
@@ -10,7 +10,7 @@ The project uses C#, ASP.NET Core, SQL Server and Entity Framework Core. The fol
 
 ## Video and build
 
-- YouTube video: https://youtu.be/AevTd0TqWYo
+- YouTube video: 
 - GitHub Actions: [passed](https://github.com/bxredyy/RaceDay/actions/runs/39121491026)
 
 ![Passing SQLite and SQL Server jobs](docs/evidence/ci-green.png)
@@ -161,3 +161,18 @@ AI tools helped with planning, code, tests, debugging and documentation.
 ## References
 
 The numbered sources are listed in [references](docs/references.md). GeeksforGeeks is used for the main concepts, with Microsoft and Swashbuckle documentation for the framework details.
+## Part 3 - ASP.NET Core 8 MVC, Azure Blob Storage and Docker
+- **Web Frontend (MVC):** Built ASP.NET Core 8 MVC (RaceDay.MVC) with Models, Services (RaceDayApiClient, BlobStorageService), Controllers, and Razor Views.
+- **Azure Blob Storage:** Integrated Azure.Storage.Blobs for container and blob uploads with public URL generation.
+- **REST API Integration:** Connected MVC controllers to the RaceDay REST API backend using IHttpClientFactory and session auth headers.
+- **Containerization and CI/CD:** Containerized with multi-stage Dockerfile (raceday-mvc:latest on port 8080) and wired to GitHub Actions on bxredyy/RaceDay.
+
+## Part 3 - ASP.NET Core 8 MVC, Azure Blob Storage and Docker
+- **MVC Web App:** ASP.NET Core 8 MVC (RaceDay.MVC) with Models, RaceDayApiClient, BlobStorageService, Controllers, and Razor Views.
+- **Azure Blob Storage:** Integrated Azure.Storage.Blobs for container and blob uploads with public URL generation.
+- **API and Auth:** Connected controllers to the RaceDay REST API via IHttpClientFactory and session headers.
+- **Docker and Pipeline:** Multi-stage Dockerfile (raceday-mvc:latest on port 8080) and GitHub Actions workflow on bxredyy/RaceDay.
+
+## Presentation Video
+https://youtu.be/AevTd0TqWYo
+

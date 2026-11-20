@@ -1,4 +1,4 @@
-using System.Net; 
+﻿using System.Net; 
 using System.Net.Http.Headers; 
 using System.Text; 
 using System.Text.Json; 
@@ -14,7 +14,7 @@ private void AttachAuthHeaders() { var s = _ctx.HttpContext?.Session; var uid = 
 public async Task<(bool Ok, AuthResponseDto? User, string? Error)> RegisterAsync(RegisterViewModel m) { var r = await _http.PostAsync("api/auth/register", new StringContent(JsonSerializer.Serialize(m), Encoding.UTF8, "application/json")); var b = await r.Content.ReadAsStringAsync(); return r.IsSuccessStatusCode ? (true, JsonSerializer.Deserialize<AuthResponseDto>(b, Opts), null) : (false, null, string.IsNullOrWhiteSpace(b) ? "Registration failed." : b); } 
 public async Task<(bool Ok, AuthResponseDto? User, string? Error)> LoginAsync(LoginViewModel m) { var r = await _http.PostAsync("api/auth/login", new StringContent(JsonSerializer.Serialize(m), Encoding.UTF8, "application/json")); var b = await r.Content.ReadAsStringAsync(); return r.IsSuccessStatusCode ? (true, JsonSerializer.Deserialize<AuthResponseDto>(b, Opts), null) : (false, null, "Invalid email or password."); } 
 public async Task LogoutAsync() { AttachAuthHeaders(); await _http.PostAsync("api/auth/logout", null); } 
-public async Task<List<EventDto>> GetEventsAsync() { var r = await _http.GetAsync("api/events"); return r.IsSuccessStatusCode ? (JsonSerializer.Deserialize<List<EventDto>>(await r.Content.ReadAsStringAsync(), Opts) ?? new()) : new(); } 
+public async Task<List<EventDto>> GetEventsAsync() { try { var r = await _http.GetAsync("api/events"); return r.IsSuccessStatusCode ? (JsonSerializer.Deserialize<List<EventDto>>(await r.Content.ReadAsStringAsync(), Opts) ?? new()) : new(); } catch { return new(); } } 
 public async Task<EventDto?> GetEventByIdAsync(int id) { var r = await _http.GetAsync($"api/events/{id}"); return r.IsSuccessStatusCode ? JsonSerializer.Deserialize<EventDto>(await r.Content.ReadAsStringAsync(), Opts) : null; } 
 public async Task<(bool Ok, EventDto? Created)> CreateEventAsync(EventFormViewModel m) { AttachAuthHeaders(); var r = await _http.PostAsync("api/events", new StringContent(JsonSerializer.Serialize(new { m.Name, m.Description, m.EventDate, m.Location, m.EventType, m.BannerImageUrl }), Encoding.UTF8, "application/json")); return r.IsSuccessStatusCode ? (true, JsonSerializer.Deserialize<EventDto>(await r.Content.ReadAsStringAsync(), Opts)) : (false, null); } 
 public async Task<bool> UpdateEventAsync(int id, EventFormViewModel m) { AttachAuthHeaders(); return (await _http.PutAsync($"api/events/{id}", new StringContent(JsonSerializer.Serialize(new { m.Name, m.Description, m.EventDate, m.Location, m.EventType, m.BannerImageUrl }), Encoding.UTF8, "application/json"))).IsSuccessStatusCode; } 
@@ -30,3 +30,5 @@ public async Task<ProfileViewModel?> GetProfileAsync() { AttachAuthHeaders(); va
 public async Task<bool> UpdateProfileAsync(ProfileViewModel m) { AttachAuthHeaders(); return (await _http.PutAsync("api/users/profile", new StringContent(JsonSerializer.Serialize(new { m.FullName, m.PhoneNumber, m.ProfilePictureUrl }), Encoding.UTF8, "application/json"))).IsSuccessStatusCode; } 
 public async Task<string?> UploadAvatarAsync(IFormFile file) { AttachAuthHeaders(); using var form = new MultipartFormDataContent(); await using var s = file.OpenReadStream(); var sc = new StreamContent(s); sc.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType); form.Add(sc, "file", file.FileName); var r = await _http.PostAsync("api/users/profile/upload-avatar", form); if (!r.IsSuccessStatusCode) return null; using var d = JsonDocument.Parse(await r.Content.ReadAsStringAsync()); return d.RootElement.TryGetProperty("profilePictureUrl", out var p) ? p.GetString() : null; } 
 } 
+
+
