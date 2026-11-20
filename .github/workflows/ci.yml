@@ -1,0 +1,87 @@
+name: RaceDay build and tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build, validate structure and test with SQLite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Validate required submission structure
+        shell: bash
+        run: |
+          test -f RaceDay.sln
+          test -f README.md
+          test -f docs/erd.png
+          test -f docs/endpoint-plan.md
+          test -f docs/RaceDay.sql
+          test -f docs/plan-amendments.md
+          test -f Part2/RaceDay.Api/Program.cs
+          test -f Part2/RaceDay.Tests/RaceDay.Tests.csproj
+          test -n "$(find Part2/RaceDay.Api/Data/Migrations -name '*InitialCreate.cs' -print -quit)"
+      - name: Restore
+        run: dotnet restore RaceDay.sln
+      - name: Build Release
+        run: dotnet build RaceDay.sln --configuration Release --no-restore
+      - name: Run automated tests
+        run: dotnet test RaceDay.sln --configuration Release --no-build --logger trx --results-directory TestResults --collect:"XPlat Code Coverage"
+      - name: Keep test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlite-test-results
+          path: TestResults/
+
+  sqlserver-tests:
+    name: Verify migrations and HTTP tests against SQL Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: 'Y'
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: 'RaceDay!CiOnly2026'
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'RaceDay!CiOnly2026' -C -Q 'SELECT 1' -b"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      RACEDAY_TEST_SQLSERVER: "Server=localhost,1433;Database=master;User Id=sa;Password=RaceDay!CiOnly2026;TrustServerCertificate=True"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Execute the SSMS script twice and check its sample data
+        shell: bash
+        run: |
+          docker cp docs/RaceDay.sql "${{ job.services.sqlserver.id }}:/tmp/RaceDay.sql"
+          docker exec "${{ job.services.sqlserver.id }}" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'RaceDay!CiOnly2026' -C -b -i /tmp/RaceDay.sql
+          docker exec "${{ job.services.sqlserver.id }}" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'RaceDay!CiOnly2026' -C -b -i /tmp/RaceDay.sql
+          docker exec "${{ job.services.sqlserver.id }}" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'RaceDay!CiOnly2026' -C -b -d RaceDay -Q "IF (SELECT COUNT(*) FROM Users) <> 4 THROW 50000, 'Expected four demo users', 1; IF (SELECT COUNT(*) FROM Events) <> 3 THROW 50000, 'Expected three demo events', 1; IF (SELECT COUNT(*) FROM Categories) <> 3 THROW 50000, 'Expected three categories', 1; IF (SELECT COUNT(*) FROM Enrolments) <> 4 THROW 50000, 'Expected four enrolments', 1; IF (SELECT COUNT(*) FROM Results) <> 1 THROW 50000, 'Expected one result', 1;"
+      - run: dotnet restore RaceDay.sln
+      - run: dotnet build RaceDay.sln --configuration Release --no-restore
+      - name: Test against SQL Server with EF migrations
+        run: dotnet test RaceDay.sln --configuration Release --no-build --logger trx --results-directory TestResults
+      - name: Keep SQL Server test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlserver-test-results
+          path: TestResults/
