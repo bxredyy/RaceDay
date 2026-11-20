@@ -2,7 +2,7 @@
 
 Mukona Mamaila  
 ST10494639  
-PROG6212 Part 2
+PROG6212 POE
 
 RaceDay is an API for running, walking and cycling events. Organisers can manage their events, categories and results. Participants can register, enter events and view their own results.
 
